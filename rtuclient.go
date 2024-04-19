@@ -42,12 +42,6 @@ const (
 	readFifoQueueFunctionCode             = 0x18
 )
 
-// RTUClient creates RTU client with default handler and given connect string.
-func RTUClient(address string) Client {
-	handler := NewRTUClientHandler(address)
-	return NewClient(handler)
-}
-
 // RTUClientHandler implements Packager and Transporter interface.
 type RTUClientHandler struct {
 	rtuPackager
@@ -64,6 +58,12 @@ func NewRTUClientHandler(address string) *RTUClientHandler {
 
 	handler.serialPort.Logger = handler.Logger // expose the logger
 	return handler
+}
+
+// RTUClient creates RTU client with default handler and given connect string.
+func RTUClient(address string) Client {
+	handler := NewRTUClientHandler(address)
+	return NewClient(handler)
 }
 
 // Clone creates a new client handler with the same underlying shared transport.

@@ -22,12 +22,6 @@ const (
 // Modbus ASCII defines ':' but in the field often '>' is seen.
 var asciiStart = []string{":", ">"}
 
-// ASCIIClient creates ASCII client with default handler and given connect string.
-func ASCIIClient(address string) Client {
-	handler := NewASCIIClientHandler(address)
-	return NewClient(handler)
-}
-
 // ASCIIClientHandler implements Packager and Transporter interface.
 type ASCIIClientHandler struct {
 	asciiPackager
@@ -43,6 +37,12 @@ func NewASCIIClientHandler(address string) *ASCIIClientHandler {
 	}
 	handler.serialPort.Logger = handler.Logger // expose the logger
 	return handler
+}
+
+// ASCIIClient creates ASCII client with default handler and given connect string.
+func ASCIIClient(address string) Client {
+	handler := NewASCIIClientHandler(address)
+	return NewClient(handler)
 }
 
 // Clone creates a new client handler with the same underlying shared transport.
