@@ -56,10 +56,9 @@ func NewTCPClientHandler(address string) *TCPClientHandler {
 
 // Clone creates a new client handler with the same underlying shared transport.
 func (mb *TCPClientHandler) Clone() *TCPClientHandler {
-	h := &TCPClientHandler{
+	return &TCPClientHandler{
 		tcpTransporter: mb.tcpTransporter,
 	}
-	return h
 }
 
 // tcpPackager implements Packager interface.

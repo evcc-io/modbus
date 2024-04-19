@@ -34,10 +34,9 @@ func NewRTUOverTCPClientHandler(address string) *RTUOverTCPClientHandler {
 
 // Clone creates a new client handler with the same underlying shared transport.
 func (mb *RTUOverTCPClientHandler) Clone() *RTUOverTCPClientHandler {
-	h := &RTUOverTCPClientHandler{
+	return &RTUOverTCPClientHandler{
 		rtuTCPTransporter: mb.rtuTCPTransporter,
 	}
-	return h
 }
 
 // rtuTCPTransporter implements Transporter interface.

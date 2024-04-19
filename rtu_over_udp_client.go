@@ -21,23 +21,33 @@ func (length ErrADUResponseLength) Error() string {
 	return fmt.Sprintf("modbus: ADU response length '%d' must not be less than 2", length)
 }
 
-// RTUOverUDPClientHandler implements Packager and Transporter interface.
-type RTUOverUDPClientHandler struct {
-	rtuPackager
-	rtuUDPTransporter
-}
-
-// NewRTUOverUDPClientHandler allocates and initializes a RTUOverUDPClientHandler.
-func NewRTUOverUDPClientHandler(address string) *RTUOverUDPClientHandler {
-	handler := &RTUOverUDPClientHandler{}
-	handler.Address = address
-	return handler
-}
-
 // RTUOverUDPClient creates RTU over UDP client with default handler and given connect string.
 func RTUOverUDPClient(address string) Client {
 	handler := NewRTUOverUDPClientHandler(address)
 	return NewClient(handler)
+}
+
+// RTUOverUDPClientHandler implements Packager and Transporter interface.
+type RTUOverUDPClientHandler struct {
+	rtuPackager
+	*rtuUDPTransporter
+}
+
+// NewRTUOverUDPClientHandler allocates and initializes a RTUOverUDPClientHandler.
+func NewRTUOverUDPClientHandler(address string) *RTUOverUDPClientHandler {
+	handler := &RTUOverUDPClientHandler{
+		rtuUDPTransporter: &rtuUDPTransporter{
+			Address: address,
+		},
+	}
+	return handler
+}
+
+// Clone creates a new client handler with the same underlying shared transport.
+func (mb *RTUOverUDPClientHandler) Clone() *RTUOverUDPClientHandler {
+	return &RTUOverUDPClientHandler{
+		rtuUDPTransporter: mb.rtuUDPTransporter,
+	}
 }
 
 // rtuUDPTransporter implements Transporter interface.
