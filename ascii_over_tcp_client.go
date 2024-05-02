@@ -32,10 +32,9 @@ func ASCIIOverTCPClient(address string) Client {
 
 // Clone creates a new client handler with the same underlying shared transport.
 func (mb *ASCIIOverTCPClientHandler) Clone() *ASCIIOverTCPClientHandler {
-	h := &ASCIIOverTCPClientHandler{
+	return &ASCIIOverTCPClientHandler{
 		asciiTCPTransporter: mb.asciiTCPTransporter,
 	}
-	return h
 }
 
 // asciiTCPTransporter implements Transporter interface.
