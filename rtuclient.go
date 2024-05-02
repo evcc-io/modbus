@@ -56,7 +56,6 @@ func NewRTUClientHandler(address string) *RTUClientHandler {
 		},
 	}
 
-	handler.serialPort.Logger = handler.Logger // expose the logger
 	return handler
 }
 
