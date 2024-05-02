@@ -17,13 +17,11 @@ type RTUOverTCPClientHandler struct {
 
 // NewRTUOverTCPClientHandler allocates and initializes a RTUOverTCPClientHandler.
 func NewRTUOverTCPClientHandler(address string) *RTUOverTCPClientHandler {
-	handler := &RTUOverTCPClientHandler{
+	return &RTUOverTCPClientHandler{
 		rtuTCPTransporter: &rtuTCPTransporter{
 			defaultTCPTransporter(address),
 		},
 	}
-
-	return handler
 }
 
 // RTUOverTCPClient creates RTU over TCP client with default handler and given connect string.

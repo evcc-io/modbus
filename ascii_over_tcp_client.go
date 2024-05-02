@@ -16,12 +16,11 @@ type ASCIIOverTCPClientHandler struct {
 
 // NewASCIIOverTCPClientHandler allocates and initializes a ASCIIOverTCPClientHandler.
 func NewASCIIOverTCPClientHandler(address string) *ASCIIOverTCPClientHandler {
-	handler := &ASCIIOverTCPClientHandler{
+	return &ASCIIOverTCPClientHandler{
 		asciiTCPTransporter: &asciiTCPTransporter{
 			defaultTCPTransporter(address),
 		},
 	}
-	return handler
 }
 
 // ASCIIOverTCPClient creates ASCII over TCP client with default handler and given connect string.

@@ -42,10 +42,9 @@ type TCPClientHandler struct {
 // NewTCPClientHandler allocates a new TCPClientHandler.
 func NewTCPClientHandler(address string) *TCPClientHandler {
 	transport := defaultTCPTransporter(address)
-	h := &TCPClientHandler{
+	return &TCPClientHandler{
 		tcpTransporter: &transport,
 	}
-	return h
 }
 
 // TCPClient creates TCP client with default handler and given connect string.

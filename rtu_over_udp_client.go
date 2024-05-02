@@ -29,12 +29,11 @@ type RTUOverUDPClientHandler struct {
 
 // NewRTUOverUDPClientHandler allocates and initializes a RTUOverUDPClientHandler.
 func NewRTUOverUDPClientHandler(address string) *RTUOverUDPClientHandler {
-	handler := &RTUOverUDPClientHandler{
+	return &RTUOverUDPClientHandler{
 		rtuUDPTransporter: &rtuUDPTransporter{
 			Address: address,
 		},
 	}
-	return handler
 }
 
 // RTUOverUDPClient creates RTU over UDP client with default handler and given connect string.

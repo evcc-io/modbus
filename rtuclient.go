@@ -50,13 +50,11 @@ type RTUClientHandler struct {
 
 // NewRTUClientHandler allocates and initializes a RTUClientHandler.
 func NewRTUClientHandler(address string) *RTUClientHandler {
-	handler := &RTUClientHandler{
+	return &RTUClientHandler{
 		rtuSerialTransporter: &rtuSerialTransporter{
 			serialPort: defaultSerialPort(address),
 		},
 	}
-
-	return handler
 }
 
 // RTUClient creates RTU client with default handler and given connect string.

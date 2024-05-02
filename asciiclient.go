@@ -30,13 +30,11 @@ type ASCIIClientHandler struct {
 
 // NewASCIIClientHandler allocates and initializes a ASCIIClientHandler.
 func NewASCIIClientHandler(address string) *ASCIIClientHandler {
-	handler := &ASCIIClientHandler{
+	return &ASCIIClientHandler{
 		asciiSerialTransporter: &asciiSerialTransporter{
 			serialPort: defaultSerialPort(address),
 		},
 	}
-	handler.serialPort.Logger = handler.Logger // expose the logger
-	return handler
 }
 
 // ASCIIClient creates ASCII client with default handler and given connect string.
