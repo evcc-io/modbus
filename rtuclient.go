@@ -299,7 +299,13 @@ func (mb *rtuSerialTransporter) Send(aduRequest []byte) (aduResponse []byte, err
 
 // charDuration returns the minimum transmission duration of a character.
 func (mb *rtuSerialTransporter) charDuration() time.Duration {
-	return time.Duration(11000000/mb.BaudRate) * time.Microsecond
+	var cd int // µs
+	if mb.BaudRate <= 0 || mb.BaudRate > 19200 {
+		cd = 750
+	} else {
+		cd = 11000000 / mb.BaudRate // 11 bits
+	}
+	return time.Duration(cd) * time.Microsecond
 }
 
 // frameDelay returns the required minimum delay at the start and and the end of each frame.
@@ -309,7 +315,7 @@ func (mb *rtuSerialTransporter) frameDelay() time.Duration {
 	if mb.BaudRate <= 0 || mb.BaudRate > 19200 {
 		fd = 1750
 	} else {
-		fd = 38500000 / mb.BaudRate
+		fd = 38500000 / mb.BaudRate // 3.5 characters a 11 bits
 	}
 	return time.Duration(fd) * time.Microsecond
 }
