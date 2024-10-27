@@ -19,18 +19,18 @@ func TestRTUTiming(t *testing.T) {
 
 		charDuration := time.Duration(float64(time.Second) / float64(baudRate) * 11)
 
-		if res := c.charDuration(); math.Abs(float64(res)/float64(charDuration)-1) > precision {
-			assert.Equal(t, charDuration, res, "character duration")
-		}
+		// if res := c.charDuration(); math.Abs(float64(res)/float64(charDuration)-1) > precision {
+		// 	assert.Equal(t, charDuration, res, "character duration")
+		// }
 
-		characterDelay := charDuration * 3 / 2 // 1.5
-		if baudRate > 19200 {
-			characterDelay = 750 * time.Microsecond
-		}
+		// characterDelay := charDuration * 3 / 2 // 1.5
+		// if baudRate > 19200 {
+		// 	characterDelay = 750 * time.Microsecond
+		// }
 
-		if res := c.characterDelay(); math.Abs(float64(res)/float64(characterDelay)-1) > precision {
-			assert.Equal(t, characterDelay, res, "character delay")
-		}
+		// if res := c.characterDelay(); math.Abs(float64(res)/float64(characterDelay)-1) > precision {
+		// 	assert.Equal(t, characterDelay, res, "character delay")
+		// }
 
 		frameDelay := charDuration * 7 / 2 // 3.5
 		if baudRate > 19200 {
