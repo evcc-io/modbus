@@ -226,7 +226,7 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 		case stateReadLength:
 			// read length byte
 			length = buf[0]
-			// max length = 0, - SlaveID(1) - FunctionCode(1) - length(1) - CRC(2)
+			// max length = rtuMaxSize - SlaveID(1) - FunctionCode(1) - length(1) - CRC(2)
 			if length > rtuMaxSize-5 || length == 0 {
 				return nil, &InvalidLengthError{length: length}
 			}
