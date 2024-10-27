@@ -12,6 +12,9 @@ func TestRTUTiming(t *testing.T) {
 	c := rtuSerialTransporter{}
 
 	precision := 0.007 // 0.7%
+	imprecise := func(a, b time.Duration) bool {
+		return math.Abs(float64(a)/float64(b)-1) > precision
+	}
 
 	for _, baudRate := range []int{2400, 9600, 19200, 38400, 57600, 115200} {
 		t.Log(baudRate)
@@ -19,7 +22,7 @@ func TestRTUTiming(t *testing.T) {
 
 		charDuration := time.Duration(float64(time.Second) / float64(baudRate) * 11)
 
-		// if res := c.charDuration(); math.Abs(float64(res)/float64(charDuration)-1) > precision {
+		// if res := c.charDuration(); imprecise(res,charDuration) {
 		// 	assert.Equal(t, charDuration, res, "character duration")
 		// }
 
@@ -28,7 +31,7 @@ func TestRTUTiming(t *testing.T) {
 		// 	characterDelay = 750 * time.Microsecond
 		// }
 
-		// if res := c.characterDelay(); math.Abs(float64(res)/float64(characterDelay)-1) > precision {
+		// if res := c.characterDelay(); imprecise(res,characterDelay) {
 		// 	assert.Equal(t, characterDelay, res, "character delay")
 		// }
 
@@ -37,7 +40,7 @@ func TestRTUTiming(t *testing.T) {
 			frameDelay = 1750 * time.Microsecond
 		}
 
-		if res := c.frameDelay(); math.Abs(float64(res)/float64(frameDelay)-1) > precision {
+		if res := c.frameDelay(); imprecise(res, frameDelay) {
 			assert.Equal(t, frameDelay, res, "frame delay")
 		}
 	}
