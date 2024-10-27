@@ -218,9 +218,8 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 				data = append(data, buf[0])
 			} else if buf[0] == functionCode+0x80 {
 				state = stateReadPayload
+				toRead = 1 // only exception code left to read
 				data = append(data, buf[0])
-				// only exception code left to read
-				toRead = 1
 			}
 
 		case stateReadLength:
@@ -231,9 +230,9 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 				return nil, &InvalidLengthError{length: length}
 			}
 
+			state = stateReadPayload
 			toRead = length
 			data = append(data, length)
-			state = stateReadPayload
 
 		case stateReadPayload:
 			// read payload
