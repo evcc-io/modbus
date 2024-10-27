@@ -6,6 +6,7 @@ package modbus
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -171,15 +172,9 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 	var length, toRead byte
 	var crcCount int
 
-	started := time.Now()
-	var firstByteReceived time.Time
-
 	for {
-		if !deadline.IsZero() && time.Now().After(deadline) { // Possible that serialport may spew data
-			sinceStart := time.Since(started)
-			sinceFirstByteReceived := time.Since(firstByteReceived)
-
-			return nil, fmt.Errorf("failed to read within deadline: state: %d, since start: %v, since first byte received: %v, received: % x (%d)", state, sinceStart, sinceFirstByteReceived, data, len(data))
+		if time.Now().After(deadline) { // Possible that serialport may spew data
+			return nil, errors.New("failed to read from serial port within deadline")
 		}
 
 		bytesRead, err := io.ReadAtLeast(r, buf, 1)
@@ -194,14 +189,10 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 		switch state {
 		// expecting slaveID
 		case stateSlaveID:
-			firstByteReceived = time.Now()
-
 			// read slaveID
 			if buf[0] == slaveID {
 				state = stateFunctionCode
 				data = append(data, buf[0])
-			} else {
-				return nil, fmt.Errorf("expected slave id: %d", buf[0])
 			}
 
 		case stateFunctionCode:
@@ -229,14 +220,13 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 				default:
 					return nil, fmt.Errorf("functioncode not handled: %d", functionCode)
 				}
+				data = append(data, buf[0])
 			} else if buf[0] == functionCode+0x80 {
 				state = stateReadPayload
+				data = append(data, buf[0])
 				// only exception code left to read
 				toRead = 1
-			} else {
-				return nil, fmt.Errorf("expected functioncode: %d", buf[0])
 			}
-			data = append(data, buf[0])
 
 		case stateReadLength:
 			// read length byte
