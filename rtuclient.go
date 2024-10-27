@@ -263,7 +263,7 @@ func (mb *rtuSerialTransporter) Send(aduRequest []byte) (aduResponse []byte, err
 	}
 
 	// Wait for previous frame delay to elapse
-	time.Sleep(time.Until(mb.lastActivity.Add(2 * mb.frameDelay())))
+	time.Sleep(time.Until(mb.lastActivity.Add(mb.frameDelay())))
 	defer func() { mb.lastActivity = time.Now() }()
 
 	// Start the timer to close when idle
