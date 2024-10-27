@@ -177,13 +177,8 @@ func readIncrementally(slaveID, functionCode byte, r io.Reader, deadline time.Ti
 			return nil, errors.New("failed to read from serial port within deadline")
 		}
 
-		bytesRead, err := io.ReadAtLeast(r, buf, 1)
-		if err != nil {
+		if _, err := io.ReadAtLeast(r, buf, 1); err != nil {
 			return nil, err
-		}
-
-		if bytesRead > 1 {
-			return nil, fmt.Errorf("read more than one byte")
 		}
 
 		switch state {
