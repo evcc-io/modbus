@@ -22,7 +22,7 @@ const (
 	tcpHeaderSize = 7
 	tcpMaxLength  = 260
 	// Default TCP timeout is not set
-	tcpTimeout     = 3 * time.Second
+	tcpTimeout     = 10 * time.Second
 	tcpIdleTimeout = 60 * time.Second
 )
 
