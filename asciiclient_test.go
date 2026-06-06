@@ -68,6 +68,51 @@ func TestASCIIDecodeStartCharacter(t *testing.T) {
 	}
 }
 
+func TestExtractASCIIFrame(t *testing.T) {
+	frame := []byte(":010304010F1509CA\r\n")
+
+	tests := []struct {
+		name string
+		raw  []byte
+		want []byte
+	}{
+		{"clean", frame, frame},
+		{"leading nul", append([]byte{0, 0, 0}, frame...), frame},
+		{"trailing nul", append(append([]byte{}, frame...), 0, 0, 0), frame},
+		{"surrounding nul", append(append([]byte{0, 0}, frame...), 0, 0), frame},
+		{"interspersed nul", []byte(":01\x0003\x0004010F1509CA\r\n"), frame},
+		{"greater-than start", []byte("\x00>010304010F1509CA\r\n"), []byte(">010304010F1509CA\r\n")},
+		{"lone lf", []byte("\x00:010304010F1509CA\n"), frame},
+		{"no start char", []byte("\x00\x00garbage"), []byte("\x00\x00garbage")},
+		{"no terminator", []byte("\x00:010304010F1509CA"), []byte(":010304010F1509CA")},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := extractASCIIFrame(tc.raw); !bytes.Equal(got, tc.want) {
+				t.Fatalf("extractASCIIFrame(%q) = %q, want %q", tc.raw, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestASCIIDecodeDirtyFrame(t *testing.T) {
+	decoder := asciiPackager{}
+	aduReq := []byte(":010300010002F9\r\n")
+
+	// FTDI adapter wraps the response in NUL bytes
+	raw := append([]byte{0, 0}, []byte(":010304010F1509CA\r\n")...)
+	raw = append(raw, 0, 0)
+
+	adu := extractASCIIFrame(raw)
+	if err := decoder.Verify(aduReq, adu); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := decoder.Decode(adu); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func BenchmarkASCIIEncoder(b *testing.B) {
 	encoder := asciiPackager{
 		SlaveID: 10,
