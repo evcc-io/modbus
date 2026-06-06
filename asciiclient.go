@@ -203,15 +203,18 @@ func (mb *asciiSerialTransporter) Send(aduRequest []byte) (aduResponse []byte, e
 		if length >= asciiMaxSize || n == 0 {
 			break
 		}
-		// Expect end of frame in the data received
-		if length > asciiMinSize {
-			if string(data[length-len(asciiEnd):length]) == asciiEnd {
-				break
-			}
+		// Expect end of frame anywhere in the data received. Some serial
+		// adapters (e.g. FTDI) append stray bytes after the terminating CRLF,
+		// so the frame end is not necessarily the last byte read.
+		if length > asciiMinSize && bytes.Contains(data[:length], []byte(asciiEnd)) {
+			break
 		}
 	}
-	aduResponse = data[:length]
-	mb.logf("modbus: recv % x\n", aduResponse)
+	mb.logf("modbus: recv % x\n", data[:length])
+	// Discard any bytes outside the frame. Some serial adapters inject stray
+	// bytes (e.g. NUL) before, after or around the frame which would otherwise
+	// break framing and LRC verification.
+	aduResponse = extractASCIIFrame(data[:length])
 	return
 }
 
@@ -248,4 +251,45 @@ func isStartCharacter(str string) bool {
 		}
 	}
 	return false
+}
+
+// isHexDigit reports whether b is an ASCII hexadecimal digit (0-9, A-F, a-f).
+func isHexDigit(b byte) bool {
+	return b >= '0' && b <= '9' || b >= 'A' && b <= 'F' || b >= 'a' && b <= 'f'
+}
+
+// extractASCIIFrame returns the Modbus ASCII frame contained in raw, discarding
+// any bytes that do not belong to the frame. A valid frame starts with a start
+// character (':' or '>'), carries only hexadecimal digits and is terminated by
+// CRLF. Some serial adapters (e.g. the FTDI based ABL Confcab) inject stray
+// bytes such as NUL before, after or in between, which would otherwise break
+// framing and LRC verification. Non-hex bytes within the frame are dropped so
+// the surrounding colon and CRLF are preserved for the packager.
+//
+// If no start character is found the input is returned unchanged so the caller's
+// verification reports the original, unframed response.
+func extractASCIIFrame(raw []byte) []byte {
+	start := bytes.IndexByte(raw, asciiStart[0][0])
+	for _, s := range asciiStart[1:] {
+		if i := bytes.IndexByte(raw, s[0]); i >= 0 && (start < 0 || i < start) {
+			start = i
+		}
+	}
+	if start < 0 {
+		return raw
+	}
+
+	frame := make([]byte, 0, len(raw)-start)
+	frame = append(frame, raw[start]) // keep the original start character
+	for _, b := range raw[start+1:] {
+		switch {
+		case b == '\r' || b == '\n':
+			return append(frame, '\r', '\n')
+		case isHexDigit(b):
+			frame = append(frame, b)
+		}
+	}
+
+	// no CRLF seen; return the partial frame so verification reports it
+	return frame
 }
