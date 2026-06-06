@@ -255,7 +255,7 @@ func isStartCharacter(str string) bool {
 
 // isHexDigit reports whether b is an ASCII hexadecimal digit (0-9, A-F, a-f).
 func isHexDigit(b byte) bool {
-	return b >= '0' && b <= '9' || b >= 'A' && b <= 'F' || b >= 'a' && b <= 'f'
+	return b >= '0' && b <= '9' || b >= 'A' && b <= 'F'
 }
 
 // extractASCIIFrame returns the Modbus ASCII frame contained in raw, discarding
